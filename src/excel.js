@@ -15,18 +15,20 @@ class ExcelComponent extends Component {
     }
     handleImport = (file) => {
         const wb = new Excel.Workbook();
-        wb.xlsx.readFile(file).then(function () {
-            var workSheet = wb.getWorksheet(1);
+        const reader = new FileReader()
 
-            workSheet.eachRow({ includeEmpty: true }, function (row, rowNumber) {
-
-                let currRow = workSheet.getRow(rowNumber);
-                console.log("User Name :" + currRow.getCell(1).value + ", Password :" + currRow.getCell(2).value);
-                console.log("User Name :" + row.values[1] + ", Password :" + row.values[2]);
-
-                //  console.log("Row " + rowNumber + " = " + JSON.stringify(row.values));
-            });
-        })
+        reader.readAsArrayBuffer(file)
+        reader.onload = () => {
+            const buffer = reader.result;
+            wb.xlsx.load(buffer).then(workbook => {
+                console.log(workbook, 'workbook instance')
+                workbook.eachSheet((sheet, id) => {
+                    sheet.eachRow((row, rowIndex) => {
+                        console.log(row.values, rowIndex)
+                    })
+                })
+            })
+        }
     }
     render() {
         return (
